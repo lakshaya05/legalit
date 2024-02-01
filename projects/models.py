@@ -1,60 +1,28 @@
 import uuid
 from django.db import models
+from django.contrib.auth.models import User
 
-# Create your models here.
+
+class Lawyer(models.Model):
+    name = models.CharField(max_length=100)
+    expertise = models.CharField(max_length=200)
+    # Additional lawyer-related fields
+    address = models.TextField(blank=True, null=True)
+    years_of_practice = models.IntegerField(blank=True, null=True)
+    no_of_cases_taken = models.IntegerField(blank=True, null=True)
+    no_of_cases_won = models.IntegerField(blank=True, null=True)
+    specialization = models.CharField(max_length=100, blank=True, null=True)
+    # Add other lawyer-related fields as needed\
 
 
-class Project(models.Model):
-   #owner
-    title = models.CharField(max_length=200)
-    description = models.TextField(null=True, blank=True)
-    featured_image=models.ImageField(null=True, blank=True, default="default.jpg")
-    demo_link = models.CharField(max_length=1000, null=True, blank=True)
-    source_link = models.CharField(max_length=200, null=True, blank=True)
-    vote_total = models.IntegerField(default=0)
-    vote_ratio = models.IntegerField(default=0)
-    tags = models.ManyToManyField('Tag', blank=True)
-    created = models.DateTimeField(auto_now_add=True)
-    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
-     
-    
-    def __str__(self):
-        return self.title
-    
-    @property 
-    def imageURL(self):
-        try:
-            img= self.featured_image.url
-        except:
-            img = ''
-        return  img 
-    
-class Review(models.Model):
 
-    VOTE_TYPE = (
-        ('up','up'),
-        ('down','down'),
-    )
-
-        #owner=
-    project = models.ForeignKey( 
-            Project, on_delete=models.CASCADE, null=True,blank=True)
-    body = models.TextField(null=True, blank=True)
-    Value = models.CharField(max_length=50 , choices=VOTE_TYPE)
-    updated= models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
-    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+ 
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # Add additional user profile fields as needed
+    full_name = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
 
     def __str__(self):
-        return self.Value
-    
-class Tag(models.Model):
-    name= models.CharField(max_length=200)
-    created = models.DateTimeField(auto_now_add=True)
-    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
-
-    def __str__(self):
-        return self.name
-
-      
-    
+        return self.user.username
+  

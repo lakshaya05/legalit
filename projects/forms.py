@@ -1,18 +1,13 @@
-from django.forms import ModelForm
-from .models import Project 
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
+class RegistrationForm(UserCreationForm):
+    full_name = forms.CharField(max_length=255, required=True)
+    phone_number = forms.CharField(max_length=15, required=True)
 
-class ProjectForm(ModelForm):
     class Meta:
-        model = Project
-        fields = '__all__'
-        exclude = ['vote_total','vote_ratio']
+        model = User
+        fields = ['username', 'password1', 'password2', 'email']
 
-    def __init__(self, *args, **kwargs):
-        super(ProjectForm, self).__init__(*args, **kwargs)
-
-        for key , value in self.fields.items():
-            value.widget.attrs.update({'class': 'input'})
-
-       # self.fields['title'].widget.attrs.update({'class': 'input'})
     

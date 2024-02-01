@@ -1,62 +1,45 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from .models import Project
-from .forms import ProjectForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
+from django.urls import path
 
-
-
-def projects(request):
-    projects = Project.objects.all()
-    context = {'projects':projects}
-    return render(request, 'projects/projects.html', context)
-
-def project(request,pk):
-    projectObj = Project.objects.get(id=pk)
-    context = {'project':projectObj}
-    return render(request,'projects/single-projects.html', context) 
-
-def createproject(request):
-    form = ProjectForm()
-    
-    if request.method == "POST":
-       form = ProjectForm(request.POST, request.FILES)
-       if form.is_valid():
-           form.save()
-           return redirect('projects')
-       
-
-
-     
-
-
-    context = {'form': form}
-
-    return render (request, 'projects/project-form.html', context)
-
-
-def updateProject(request,pk):
-    context = {}
-    project = Project.objects.get(id=pk)
-    form= ProjectForm(instance=project)
-    template = 'projects/project-form.html'
-
+# Registration view
+def register_view(request):
     if request.method == 'POST':
-      form = ProjectForm(request.POST, request.FILES , instance=project )
-      if form.is_valid():
-          form.save()
-          return redirect('projects')
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home')
+    else:
+        form = UserCreationForm()
+    return render(request, 'register.html', {'form': form})
 
-
-
-    context = {'form': form}
-
-
-    return render(request, template, context)
-
-def deleteProject(request,pk):
-    project = Project.objects.get(id=pk)
-
+# Login view
+def login_view(request):
     if request.method == 'POST':
-        project.delete()
-        return redirect('projects')
-    return render(request, 'projects/delete.html', {'object':project})
+        form = AuthenticationForm(request, request.POST)
+        if form.is_valid():
+            login(request, form.get_user())
+            return redirect('home')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'login.html', {'form': form})
+
+# Logout view
+@login_required
+def logout_view(request):
+    logout(request)
+    return redirect('about')
+
+# Home view
+@login_required
+def home_view(request):
+    return render(request, 'home.html')
+
+# About view
+def about_view(request):
+    return render(request, 'about.html')
+
+
